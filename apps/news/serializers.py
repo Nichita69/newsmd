@@ -1,6 +1,6 @@
 from rest_framework import serializers
-from apps.news.models import *
-from apps.news.models import News, Category
+
+from apps.news.models import News, Category, Comment, Attachment
 
 
 class NewsSerializer(serializers.ModelSerializer):
@@ -12,4 +12,25 @@ class NewsSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
+        fields = "__all__"
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = "__all__"
+
+
+class NewsRetrieveSerializer(serializers.ModelSerializer):
+    comment_set = CommentSerializer(many=True)
+    category = CategorySerializer()
+
+    class Meta:
+        model = News
+        fields = "__all__"
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attachment
         fields = "__all__"

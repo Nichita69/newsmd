@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import permissions
@@ -17,14 +19,9 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', include('apps.users.urls')),
-    path('', include('apps.news.urls')),
-    path('admin/', admin.site.urls),
-    path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('jwt/', include([
-        path('token/', TokenObtainPairView.as_view(), name='token_obtain-pair'),
-        path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
-        path('token/verify/', TokenVerifyView.as_view(), name='token-verify'),
-    ])),
-]
-
+                  path('users/', include('apps.users.urls')),
+                  path('news/', include('apps.news.urls')),
+                  path('admin/', admin.site.urls),
+                  path('ckeditor/', include('ckeditor_uploader.urls')),
+                  path('', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
