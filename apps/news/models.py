@@ -1,13 +1,12 @@
 import os
 from pathlib import Path
 
-from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
+from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
-from pip._internal.cli.spinners import open_spinner
+from django.db import models
 
 from apps.common.models import BaseModel
-from django.db import models
 
 
 def upload_to(instance, filename):
@@ -26,6 +25,8 @@ class News(BaseModel):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     is_publish = models.BooleanField(default=False)
     image = models.ImageField(upload_to=upload_to)
+    members = models.ManyToManyField(User, related_name='members', blank=True)
+    total_views = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = 'News'
@@ -39,12 +40,24 @@ class Comment(BaseModel):
 
 
 class Attachment(BaseModel):
-    file = models.FileField( upload_to="foo/", validators=[FileExtensionValidator(allowed_extensions=["pdf"])])
+    file = models.FileField(
+        upload_to="foo/",
+        validators=[FileExtensionValidator(
+            allowed_extensions=["pdf", "jpg", "png"]
+        )
+        ]
+    )
     title = models.CharField(max_length=255, null=True)
     public = models.BooleanField(default=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
     @property
     def extension(self):
-        return self
+        name, extension = os.path.splitext(self.file.name)
+        return extension
 
+    class Timer(BaseModel):
+        news = models.ForeignKey(News, on_delete=models.CASCADE)
+        is_stopped = models.BooleanField(default=False)
+        is_running = models.BooleanField(default=False)
+        user = models.ForeignKey(User, on_delete=models.CASCADE)
