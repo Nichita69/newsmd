@@ -9,7 +9,7 @@ from django.db import models
 from apps.common.models import BaseModel
 
 
-def upload_to(instance, filename):
+def upload_to(instance, filename: str) -> str:
     return Path(str(instance.owner_id)).joinpath(filename).as_posix()
 
 
@@ -40,7 +40,7 @@ class Comment(BaseModel):
 
 
 class Attachment(BaseModel):
-    file = models.FileField(
+    file_upload = models.FileField(
         upload_to="foo/",
         validators=[FileExtensionValidator(
             allowed_extensions=["pdf", "jpg", "png"]
@@ -50,10 +50,16 @@ class Attachment(BaseModel):
     title = models.CharField(max_length=255, null=True)
     public = models.BooleanField(default=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    file_size = models.IntegerField(default=0)
+
+    def save(self, **kwargs):
+        if not self.file_size:
+            self.file_size = self.file_upload.size
+            super().save(**kwargs)
 
     @property
-    def extension(self):
-        name, extension = os.path.splitext(self.file.name)
+    def extension(self) -> str:
+        name, extension = os.path.splitext(self.file_upload.name)
         return extension
 
     class Timer(BaseModel):

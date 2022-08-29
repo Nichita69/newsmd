@@ -27,7 +27,7 @@ class CategoryViewSet(ModelViewSet):
     serializer_class = CategorySerializer
     queryset = Category.objects.all()
 
-    def get_permissions(self):
+    def get_permissions(self) -> list:
         if self.action in ('create', 'update', 'destroy', 'partial_update'):
             self.permission_classes = (IsAdminUser,)
         return super(CategoryViewSet, self).get_permissions()
@@ -42,7 +42,7 @@ class NewsViewSet(ModelViewSet):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
 
-    def retrieve(self, request, *args, **kwargs):
+    def retrieve(self, request, *args, **kwargs) -> Response:
         instance: News = self.get_object()
         user: User = request.user
 
@@ -68,9 +68,6 @@ class AttachmentViewSet(ModelViewSet):
 
         return super(AttachmentViewSet, self).get_queryset()
 
-    # def get_queryset(self):
-    #
-
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
@@ -82,7 +79,3 @@ class CommentViewSet(ModelViewSet):
         news = self.get_object()
         count_comments = Comment.objects.filter(news=news).count()
         return Response({'count_comments': count_comments})
-
-
-    # @action(detail=True,methods=['post'],serializer_class=Serializer,url_path='adauga_comments')
-
