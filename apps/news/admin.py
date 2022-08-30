@@ -1,15 +1,12 @@
-import os
-import warnings
-from datetime import date
+
 
 from django.contrib import admin
-from django.contrib.admin import SimpleListFilter
+
 from django.db.models import Q
 from django.template.defaultfilters import filesizeformat
 from rangefilter.filters import DateRangeFilter, DateTimeRangeFilter
-from django.core.validators import FileExtensionValidator
+
 from apps.news.models import News, Attachment, Comment, Category
-from django.db import models
 
 
 @admin.register(News)
@@ -68,8 +65,10 @@ class SizeListFilter(admin.SimpleListFilter):
             return queryset.filter(file_size__lte=1048576)
         if self.value() == '1MB - 5Mb':
             return queryset.filter(file_size__gt=1048576, file_size__lte=5242880)
-        if self.value() == '> 5Mb':
+        if self.value() == '10MB> 5Mb':
             return queryset.filter(file_size__gt=5242880)
+        if self.value() == '> 10Mb':
+            return queryset.filter(file_size__gt=52428800)
 
 
 @admin.register(Attachment)
