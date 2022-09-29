@@ -1,5 +1,4 @@
-import owner as owner
-from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework import filters, parsers, renderers
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
@@ -17,7 +16,7 @@ class NewsViewSet(ModelViewSet):
     queryset = News.objects.all()
     parser_classes = (parsers.FormParser, parsers.MultiPartParser, parsers.FileUploadParser)
     renderer_classes = (renderers.JSONRenderer,)
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    filter_backends = [filters.SearchFilter]
     filterset_fields = ['category_id', 'owner']
     ordering_fields = ['id']
 
@@ -42,8 +41,6 @@ class AttachmentViewSet(ModelViewSet):
     renderer_classes = (renderers.JSONRenderer,)
     queryset = Attachment.objects.all()
     permission_classes = (IsAuthenticated,)
-
-
 
     def get_queryset(self):
         return self.queryset.filter(owner=self.request.user)
