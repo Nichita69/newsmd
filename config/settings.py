@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-mp8%kh!4!^+m@wcka4pp9$80*lx)$a^gv9lk4nbmp7@m!9unny
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 
@@ -38,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters',
+    'rangefilter',
+
 
     'drf_yasg',
     'rest_framework_swagger',
@@ -153,6 +156,12 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',)
 }
 
+SOCIALACCOUNT_PROVIDERS = {
+    'github': {
+        'GITHUB_URL': 'https://github.com/Nichita69',
+    }
+}
+
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
@@ -166,6 +175,8 @@ SWAGGER_SETTINGS = {
             'type': 'apiKey',
             'name': 'Authorization',
             'in': 'header'
+
         }
     }
 }
+
