@@ -1,3 +1,5 @@
+from timeit import Timer
+
 from django.contrib import admin
 
 from django.db.models import Q
@@ -10,8 +12,8 @@ from apps.news.models import News, Attachment, Comment, Category
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
     list_display = ("id", 'title', 'owner', 'is_publish', 'total_views')
-    list_filter = ('title', 'category', 'owner', 'is_publish',
-                   ('created_at', DateRangeFilter), ('updated_at', DateTimeFromToRangeFilter),
+    list_filter = ('title', 'owner', 'is_publish',
+                   ('updated_at'),
 
                    )
 
@@ -89,3 +91,23 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'description')
+
+
+class TimerUserFilter(admin.SimpleListFilter):
+    title = ('user')
+
+    parameter_name = 'user'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('user', 'user'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(user=self.value())
+        return queryset
+
+# @admin.register(Timer)
+# class TimerAdmin(admin.ModelAdmin):
+#     list_display = ('news', 'user')

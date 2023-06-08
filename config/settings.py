@@ -28,7 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,11 +40,12 @@ INSTALLED_APPS = [
     'django_filters',
     'rangefilter',
 
-
-    'drf_yasg',
     'rest_framework_swagger',
     'rest_framework_simplejwt',
     'ckeditor',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
+
 
     'apps.common',
     'apps.users',
@@ -148,6 +148,7 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',),
     'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
     'DEFAULT_FILTER_BACKENDS': (
@@ -169,14 +170,12 @@ SIMPLE_JWT = {
     'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
 }
 
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Token': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-
-        }
-    }
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'My API',
+    'DESCRIPTION': 'API documentation for My API',
+    'VERSION': '1.0.0',
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+    },
 }
 

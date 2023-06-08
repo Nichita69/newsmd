@@ -5,16 +5,17 @@ from rest_framework.response import Response
 
 from apps.users.serializers import UserSerializer
 
+
 class RegisterUserView(GenericAPIView):
     serializer_class = UserSerializer
     permission_classes = (AllowAny,)
     authentication_classes = ()
 
-    def post(self,request,*args,**kwargs):
+    def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         validated_data = serializer.validated_data
-        user = User.objects.create(
+        user = User.objects.create_user(
             first_name=validated_data['first_name'],
             last_name=validated_data['last_name'],
             username=validated_data['username'],
@@ -31,5 +32,3 @@ class UsersListView(ListAPIView, GenericAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
-
-

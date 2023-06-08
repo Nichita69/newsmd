@@ -16,9 +16,12 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    def comment_count(self, obj):
+        return obj.comment_set.count()
+
     class Meta:
         model = Comment
-        fields = "__all__"
+        fields = "__all__, comment_count"
 
 
 class NewsRetrieveSerializer(serializers.ModelSerializer):

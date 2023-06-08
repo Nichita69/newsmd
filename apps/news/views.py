@@ -1,4 +1,4 @@
-import owner as owner
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, parsers, renderers
 from rest_framework.decorators import action
@@ -43,8 +43,6 @@ class AttachmentViewSet(ModelViewSet):
     queryset = Attachment.objects.all()
     permission_classes = (IsAuthenticated,)
 
-
-
     def get_queryset(self):
         return self.queryset.filter(owner=self.request.user)
 
@@ -54,11 +52,11 @@ class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     permission_classes = (IsAuthenticated,)
 
-    # @action(detail=True, methods=['get'], serializer_class=Serializer, url_path='comment_by_news')
-    # def comment_by_news(self, request, *args, **kwargs):
-    #     news = self.get_object()
-    #     comment = Comment.objects.filter(news_id=news.id)
-    #     return Response(CommentSerializer(comment, many=True).data)
+    @action(detail=True, methods=['get'], serializer_class=Serializer, url_path='comment_by_news')
+    def comment_by_news(self, request, *args, **kwargs):
+        news = self.get_object()
+        comment = Comment.objects.filter(news_id=news.id)
+        return Response(CommentSerializer(comment, many=True).data)
 
     @action(detail=True, methods=['get'], serializer_class=Serializer, url_path='count_comments')
     def count_comments(self, request, *args, **kwargs):
