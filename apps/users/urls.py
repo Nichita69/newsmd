@@ -1,17 +1,16 @@
 from django.urls import path
+from rest_framework import routers
 
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView, TokenVerifyView,
-)
+from apps.users.views import UserViewSet
 
-from apps.users.views import RegisterUserView, UsersListView
+# Create your patterns here.
+
+app_name = "users"  # noqa
+
+router = routers.SimpleRouter(trailing_slash=False)
+router.register(r"users", UserViewSet, basename="users")
+# router.register(r"user", UserProfileViewSet, basename="user-profile")
 
 urlpatterns = [
-    path('register/', RegisterUserView.as_view(), name='token_register'),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('users/', UsersListView.as_view(), name='users_list'),
-
+    *router.urls,
 ]
