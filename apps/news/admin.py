@@ -17,7 +17,6 @@ class NewsAdmin(admin.ModelAdmin):
 
                    )
 
-
 class ExtensionListFilter(admin.SimpleListFilter):
     title = ('file extension')
 

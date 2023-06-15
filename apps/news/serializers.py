@@ -21,7 +21,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = "__all__, comment_count"
+        fields = "__all__"
 
 
 class NewsRetrieveSerializer(serializers.ModelSerializer):
