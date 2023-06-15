@@ -1,14 +1,21 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, parsers, renderers
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from rest_framework.response import Response
+from django_filters import filters
 from rest_framework.serializers import Serializer
-from rest_framework.viewsets import ModelViewSet
 
-from apps.news.models import News, Category, Comment, Attachment
-from apps.news.serializers import NewsSerializer, CategorySerializer, CommentSerializer, NewsRetrieveSerializer, \
-    AttachmentSerializer
+from apps.news.task import  retrieve_news_task, get_comment_by_news_task, count_comments_task
+from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.decorators import action
+from django_filters.rest_framework import DjangoFilterBackend
+from .serializers import (
+    NewsSerializer,
+    NewsRetrieveSerializer,
+    CategorySerializer,
+    AttachmentSerializer,
+    CommentSerializer
+)
+from .models import News, Category, Attachment, Comment
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework import parsers, renderers
 
 
 class NewsViewSet(ModelViewSet):
@@ -22,7 +29,12 @@ class NewsViewSet(ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        return Response(NewsRetrieveSerializer(instance).data)
+        result = retrieve_news_task.delay(instance.id)
+        data = result.get()
+        if data:
+            return Response(data)
+        else:
+            return Response({'error': 'News not found'}, status=404)
 
 
 class CategoryViewSet(ModelViewSet):
@@ -51,14 +63,17 @@ class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     permission_classes = (IsAuthenticated,)
 
-    @action(detail=True, methods=['get'], serializer_class=Serializer, url_path='comment_by_news')
+    @action(detail=True, methods=['get'], serializer_class=CommentSerializer, url_path='comment_by_news')
     def comment_by_news(self, request, *args, **kwargs):
         news = self.get_object()
-        comment = Comment.objects.filter(news_id=news.id)
-        return Response(CommentSerializer(comment, many=True).data)
+        result = get_comment_by_news_task.delay(news.id)
+        data = result.get()
+        return Response(data)
 
     @action(detail=True, methods=['get'], serializer_class=Serializer, url_path='count_comments')
     def count_comments(self, request, *args, **kwargs):
         news = self.get_object()
-        count_comments = Comment.objects.filter(news=news).count()
-        return Response({'count_commets': count_comments})
+        # Вызов задачи count_comments_task асинхронно
+        result = count_comments_task.delay(news.id)
+        count_comments = result.get()
+        return Response({'count_comments': count_comments})

@@ -1,0 +1,91 @@
+version: "3.9"
+
+volumes:
+  app_rabbitmq:
+    name: app_rabbitmq
+  app_postgres:
+    name: app_postgres
+  app_redis:
+    name: app_redis
+
+services:
+  rabbitmq:
+    container_name: app_rabbitmq
+    hostname: rabbitmq.app.local
+    image: rabbitmq:latest
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
+      - RABBITMQ_DEFAULT_VHOST=${RABBITMQ_VHOST}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - app_rabbitmq:/var/lib/rabbitmq
+
+  postgres:
+    container_name: app_postgres
+    hostname: postgres.app.local
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=${POSTGRES_NAME}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - app_postgres:/var/lib/postgresql/data
+
+  redis:
+    container_name: app_redis
+    hostname: redis.app.local
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - app_redis:/data
+
+  app:
+    container_name: app
+    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+
+  app_celery_beat:
+    container_name: app_celery_beat
+    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    command:
+      - ./bin/start_celery_beat.sh
+
+  app_celery_worker:
+    container_name: app_celery_worker
+    image: app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+      - redis
+      - rabbitmq
+    command:
+      - ./bin/start_celery_worker.sh
