@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+from os import environ
 from pathlib import Path
 
 from datetime import timedelta
@@ -100,6 +100,21 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+REDIS_HOST = environ["REDIS_HOST"]
+REDIS_PORT = environ["REDIS_PORT"]
+
+POSTGRES_HOST = environ["POSTGRES_HOST"]
+POSTGRES_PORT = environ["POSTGRES_PORT"]
+POSTGRES_NAME = environ["POSTGRES_NAME"]
+POSTGRES_USER = environ["POSTGRES_USER"]
+POSTGRES_PASSWORD = environ["POSTGRES_PASSWORD"]
+
+RABBITMQ_HOST = environ["RABBITMQ_HOST"]
+RABBITMQ_PORT = environ["RABBITMQ_PORT"]
+RABBITMQ_USER = environ["RABBITMQ_USER"]
+RABBITMQ_PASS = environ["RABBITMQ_PASS"]
+RABBITMQ_VHOST = environ["RABBITMQ_VHOST"]
+
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
@@ -178,4 +193,14 @@ SPECTACULAR_SETTINGS = {
         'deepLinking': True,
     },
 }
+
+CELERY_BROKER_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/{RABBITMQ_VHOST}"
+
+CELERY_RESULT_BACKEND = "django-db"
+
+CELERY_RESULT_EXTENDED = True
+
+CELERY_CACHE_BACKEND = "celery"
+
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
